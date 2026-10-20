@@ -1,0 +1,115 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+
+// Self-referencing canonical: apex host + trailing slash, matching the
+// form Google has already indexed (e.g. https://pixtokb.com/passport-visa-photo-size/).
+const canonical = new URL(Astro.url.pathname, Astro.site);
+if (!canonical.pathname.endsWith("/")) canonical.pathname += "/";
+
+const nav = [
+  { href: "/", label: "Compressor" },
+  { href: "/passport-visa-photo-size", label: "Passport & Visa" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YB469HT0C6"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-YB469HT0C6");
+    </script>
+    <script is:inline>
+      // Runs before paint to avoid a flash of the wrong theme.
+      (function () {
+        const stored = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (stored === "dark" || (!stored && prefersDark)) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors">
+    <header class="border-b border-slate-200 dark:border-slate-800">
+      <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4">
+        <a href="/" class="flex items-center gap-2 text-lg font-semibold">
+          <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">KB</span>
+          <span>KB Compressor</span>
+        </a>
+        <nav class="hidden gap-6 text-sm font-medium text-slate-600 dark:text-slate-300 md:flex">
+          {nav.map((item) => (
+            <a href={item.href} class="hover:text-indigo-600 dark:hover:text-indigo-400">{item.label}</a>
+          ))}
+        </nav>
+        <button
+          id="theme-toggle"
+          type="button"
+          aria-label="Toggle dark mode"
+          class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+        >
+          <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+          </svg>
+          <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" class="block h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </button>
+      </div>
+      <nav class="flex gap-4 overflow-x-auto border-t border-slate-100 px-4 py-2 text-sm font-medium text-slate-600 dark:border-slate-900 dark:text-slate-300 md:hidden">
+        {nav.map((item) => (
+          <a href={item.href} class="whitespace-nowrap hover:text-indigo-600 dark:hover:text-indigo-400">{item.label}</a>
+        ))}
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="mt-16 border-t border-slate-200 py-8 text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+      <div class="mx-auto max-w-5xl px-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p>&copy; {new Date().getFullYear()} KB Compressor. All processing happens in your browser — nothing is uploaded.</p>
+          <div class="flex gap-4">
+            <a href="/about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+            <a href="/privacy" class="hover:text-indigo-600 dark:hover:text-indigo-400">Privacy</a>
+            <a href="/terms" class="hover:text-indigo-600 dark:hover:text-indigo-400">Terms</a>
+            <a href="/contact" class="hover:text-indigo-600 dark:hover:text-indigo-400">Contact</a>
+          </div>
+        </div>
+        <div class="mt-4 flex gap-4 text-xs text-slate-400 dark:text-slate-500">
+          <a href="/college-application-photo-size" class="hover:text-indigo-600 dark:hover:text-indigo-400">College application photos</a>
+          <a href="/job-application-photo-size" class="hover:text-indigo-600 dark:hover:text-indigo-400">Job application photos</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const toggle = document.getElementById("theme-toggle");
+      toggle?.addEventListener("click", () => {
+        const isDark = document.documentElement.classList.toggle("dark");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+      });
+    </script>
+  </body>
+</html>

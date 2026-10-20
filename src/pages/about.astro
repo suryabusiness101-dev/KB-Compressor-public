@@ -1,0 +1,36 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="About | KB Compressor"
+  description="About KB Compressor, a free browser-based tool for compressing images to an exact KB size."
+>
+  <section class="mx-auto max-w-2xl px-4 py-16">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-white">About KB Compressor</h1>
+    <div class="mt-4 space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+      <p>
+        KB Compressor exists because most image compressors ask the wrong question. They
+        offer a "high / medium / low" quality slider, when the thing you actually need is
+        much more specific: a college application portal, a job application form, or a visa
+        photo upload that rejects anything over a hard limit like 100&nbsp;KB or 240&nbsp;KB.
+        Getting there by trial and error &mdash; drag the slider, re-upload, get rejected,
+        try again &mdash; wastes time on forms that are often already stressful enough.
+      </p>
+      <p>
+        This tool asks for the number you actually have (the KB limit from the form) and
+        works backward from it, searching for the highest image quality that still lands at
+        or under your target, rather than the other way around.
+      </p>
+      <p>
+        Everything runs locally in your browser using the HTML Canvas API. Your photo is
+        never uploaded to a server, never stored, and never leaves your device &mdash; there's
+        nothing to upload to, since there's no backend at all.
+      </p>
+      <p>
+        KB Compressor is an independent tool, not affiliated with any government agency,
+        university, employer, or application portal it's used with.
+      </p>
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,134 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Compressor from "../components/Compressor.astro";
+import FAQ from "../components/FAQ.astro";
+
+const faqItems = [
+  {
+    q: "How does compressing to an exact KB size actually work?",
+    a: "The tool re-encodes your image and searches for the highest JPEG or WebP quality setting that still lands at or under your target size, rather than applying a fixed quality level and hoping the result is small enough. If quality alone can't reach the target, it also reduces the image's pixel dimensions slightly and tries again.",
+  },
+  {
+    q: "Will compressing to a small size ruin my photo's quality?",
+    a: "Some quality loss is unavoidable once you're compressing to a specific target, but the tool always picks the highest quality that still fits, so you get the best result possible at that size. Going from a few MB down to 100–200 KB is usually barely noticeable; targets under 50 KB will show more visible compression.",
+  },
+  {
+    q: "Is my photo uploaded to a server?",
+    a: "No. Compression runs entirely in your browser using the HTML Canvas API. Your image file is never sent anywhere — there's no server involved in the compression step at all.",
+  },
+  {
+    q: "Which image formats are supported?",
+    a: "JPG, PNG, and WebP as both input and output. JPG and WebP support a quality setting, which is what lets the tool hit a precise KB target. PNG is lossless, so it can only get smaller by reducing the pixel dimensions.",
+  },
+  {
+    q: "What if the tool can't quite reach my target size?",
+    a: "For very small targets on a highly detailed photo, there's a floor to how far quality and dimensions can be reduced before the image stops being useful. In that case, the tool gets as close as it can and tells you so, rather than silently returning a broken or unrecognizable image.",
+  },
+  {
+    q: "Should I use JPG, PNG, or WebP for my target size?",
+    a: "For photos, JPG is the safest default — it's accepted almost everywhere and compresses well. WebP often reaches the same quality at a smaller size, but a few older portals don't accept it. Use PNG only if the form specifically requires it, since it will need a bigger reduction in dimensions to hit a small KB target.",
+  },
+];
+---
+
+<Layout
+  title="Compress an Image to an Exact KB Size — DV Lottery, DS-160 & More | KB Compressor"
+  description="Compress a JPG, PNG, or WebP image to an exact target file size in KB — including the 240 KB DS-160 and DV Lottery photo limit. Free, runs entirely in your browser, nothing is ever uploaded."
+>
+  <section class="mx-auto max-w-3xl px-4 pb-10 pt-14 text-center sm:pt-20">
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+      Compress an image to an exact KB size
+    </h1>
+    <p class="mx-auto mt-4 max-w-xl text-slate-600 dark:text-slate-300">
+      Set a target size in KB and get a JPG, PNG, or WebP as close to it as possible &mdash;
+      not a vague "high / medium / low" slider. Works for any portal's limit, including the
+      240 KB DS-160 / DV Lottery photo requirement. Everything runs on your device; your
+      photo never leaves your browser.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 pb-16">
+    <Compressor defaultTargetKB={200} />
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 pb-20">
+    <h2 class="text-xl font-semibold text-slate-900 dark:text-white">Common exact-size targets</h2>
+    <div class="mt-4 grid gap-3">
+      <a href="/passport-visa-photo-size" class="rounded-xl border-2 border-indigo-200 bg-indigo-50/50 p-5 hover:border-indigo-400 dark:border-indigo-900 dark:bg-indigo-950/30">
+        <p class="font-semibold text-slate-800 dark:text-slate-100">Passport &amp; visa photos</p>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">DS-160, DV Lottery, and passport renewal &mdash; 240 KB max, plus a compression-ratio check most other tools don't warn you about</p>
+      </a>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <a href="/college-application-photo-size" class="rounded-xl border border-slate-200 p-4 hover:border-indigo-400 dark:border-slate-800">
+          <p class="font-medium text-slate-800 dark:text-slate-100">College applications</p>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Photo uploads for application and ID portals</p>
+        </a>
+        <a href="/job-application-photo-size" class="rounded-xl border border-slate-200 p-4 hover:border-indigo-400 dark:border-slate-800">
+          <p class="font-medium text-slate-800 dark:text-slate-100">Job applications</p>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Headshot and photo uploads on hiring portals</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-3xl space-y-6 px-4 pb-20 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Why "compress to exact KB" is different from a quality slider</h2>
+      <p class="mt-2">
+        Most online image compressors ask you to pick a quality level — high, medium, low —
+        and hope the resulting file happens to land under whatever limit you're working
+        against. That's backwards for the most common reason people need to shrink a photo in
+        the first place: a form somewhere has a hard cap, often a strangely specific one like
+        100&nbsp;KB, 150&nbsp;KB, or 240&nbsp;KB, and anything over it gets rejected outright.
+        This tool starts from that number instead. Tell it the target size, and it works
+        backward to find the best-looking image that still fits.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">How the compression actually works</h2>
+      <p class="mt-2">
+        Under the hood, the tool draws your image onto an HTML canvas and re-encodes it as
+        JPEG or WebP, testing quality levels in a binary search until it finds the highest
+        one that still produces a file at or under your target size. If even the lowest
+        quality setting is still too large — which happens with very small targets on
+        detailed photos — it also scales down the image's pixel dimensions and repeats the
+        search. The result is the best quality achievable at your exact size limit, not a
+        guess.
+      </p>
+      <p class="mt-2">
+        PNG works differently: because PNG is a lossless format, there's no quality dial to
+        turn. The only way to shrink a PNG further is to reduce its dimensions, which is why
+        JPG or WebP will usually get you much closer to a small target with less visible
+        quality loss.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Everything happens on your device</h2>
+      <p class="mt-2">
+        There's no upload step, because there's no server involved in compressing your image.
+        The file you select is read directly by your browser, processed locally, and the
+        result is offered back to you as a download — at no point does it travel over the
+        network. That matters more than it might seem for the kinds of photos people run
+        through this tool: passport and visa photos, ID uploads, and other images tied to a
+        legal or biometric process where you'd rather not hand a copy to a third-party server
+        you don't know anything about.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Where an exact size limit shows up</h2>
+      <p class="mt-2">
+        A hard KB limit on a photo upload turns up in more places than you'd expect, but
+        government photo submissions are where it matters most: the DS-160 visa application
+        and DV Lottery entry both cap photos at exactly 240 KB, and photos that are
+        compressed too aggressively to hit that number can get flagged even when they're
+        under the limit. The <a href="/passport-visa-photo-size" class="font-medium text-indigo-600 hover:underline dark:text-indigo-400">passport &amp; visa photo page</a>
+        covers that in detail, including the compression-ratio check most other tools don't
+        mention. The same kind of hard KB cap also shows up on college application and
+        student ID portals and job application photo uploads — smaller-stakes cases covered
+        on their own pages, linked in the footer.
+      </p>
+    </div>
+  </section>
+
+  <FAQ items={faqItems} />
+</Layout>

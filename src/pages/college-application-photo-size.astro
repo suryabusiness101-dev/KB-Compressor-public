@@ -1,0 +1,103 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Compressor from "../components/Compressor.astro";
+import FAQ from "../components/FAQ.astro";
+
+const faqItems = [
+  {
+    q: "What's a typical photo size limit for college application portals?",
+    a: "It varies by school and platform, but limits between 50 KB and 200 KB are common for headshot-style uploads (student ID photos, applicant photos). Document uploads on platforms like the Common App tend to allow much more — around 2,000 KB — but those are usually PDFs, not photos. Always check the specific portal's instructions for the exact number.",
+  },
+  {
+    q: "My upload said \"successful\" but I still got a rejection notice — why?",
+    a: "A successful upload usually only confirms that your file was the right format and under the size limit. It doesn't check whether the photo itself meets content requirements — forward-facing, no filters, no other people or objects in frame, and clearly recognizable as you. Getting the file size right is a separate step from meeting those content rules.",
+  },
+  {
+    q: "Can I use this for SAT, Common App, or Coalition App photo uploads?",
+    a: "Yes, for any portal that asks for an image file under a specific KB limit. Just set the target size to whatever the portal specifies. If a platform is asking you to upload a PDF document instead of a photo, this tool won't help — it only compresses images.",
+  },
+  {
+    q: "What file formats do college application portals usually accept?",
+    a: "Most accept JPG (.jpg/.jpeg) and PNG, and some accept GIF. JPG is the safest default since it compresses well and is universally supported — use it unless the portal specifically asks for something else.",
+  },
+  {
+    q: "Does the file size limit apply to each photo, or the whole application?",
+    a: "Almost always per file, not the whole application — a portal that says \"under 150 KB\" means that individual photo, separate from any transcripts, essays, or other documents you upload elsewhere in the same application.",
+  },
+];
+---
+
+<Layout
+  title="Resize a Photo for College Applications (Exact KB) | KB Compressor"
+  description="Compress your photo to the exact KB size a college application or student ID portal requires. Free, no upload — runs in your browser."
+>
+  <section class="mx-auto max-w-3xl px-4 pb-10 pt-14 text-center sm:pt-20">
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+      Compress a photo for college application uploads
+    </h1>
+    <p class="mx-auto mt-4 max-w-xl text-slate-600 dark:text-slate-300">
+      Application and student ID portals often reject a photo for being too large. Pick the
+      size limit your portal lists and this tool will get your photo as close to it as
+      possible without over-compressing.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 pb-16">
+    <Compressor
+      defaultTargetKB={150}
+      presets={[50, 100, 150, 200]}
+      contextNote="Check your specific application portal's photo requirements page — limits vary by school, from as low as 50 KB up to 200 KB."
+      ratioWarningKB={null}
+    />
+  </section>
+
+  <section class="mx-auto max-w-3xl space-y-6 px-4 pb-20 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Why application portals cap photo size in KB</h2>
+      <p class="mt-2">
+        Most application platforms cap image uploads in KB, not MB, because photos are often
+        stored alongside thousands of other applicant records. A modern phone photo can be
+        several MB straight out of the camera — far larger than these systems were built to
+        handle per file, especially older institutional portals that predate today's high-
+        resolution cameras. Getting under the limit needs real compression, not just resizing
+        the image smaller on screen, which is why a plain "resize" tool often isn't enough on
+        its own.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Compressing vs. resizing — they're not the same thing</h2>
+      <p class="mt-2">
+        Resizing changes an image's pixel dimensions — making a 3000×3000 photo into a
+        600×600 one, for example. Compressing changes how efficiently those pixels are stored
+        on disk, largely independent of dimensions. A photo can be exactly the right pixel
+        dimensions a portal asks for and still be too many kilobytes, because compression
+        quality is a separate setting. This tool handles both: it primarily adjusts
+        compression quality to hit your KB target, and only reduces dimensions if quality
+        alone can't get there.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">What to check before you upload</h2>
+      <p class="mt-2">
+        Every college, university, and application platform sets its own limit, so there's no
+        single "correct" number — the presets above (50, 100, 150, 200 KB) cover the range
+        most portals actually use, but the portal's own instructions page is the source of
+        truth. Beyond file size, most portals also expect a forward-facing photo without
+        filters, sunglasses, or other people in frame, with your face clearly visible — a
+        photo can pass the size check and still get flagged for those reasons, so it's worth
+        checking both.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Nothing you upload here leaves your device</h2>
+      <p class="mt-2">
+        Since application photos are tied to your real identity and often submitted alongside
+        sensitive personal information elsewhere in the same form, this tool compresses
+        entirely in your browser — there's no server that ever receives the image, so there's
+        nothing to worry about beyond the file you download at the end.
+      </p>
+    </div>
+  </section>
+
+  <FAQ items={faqItems} />
+</Layout>

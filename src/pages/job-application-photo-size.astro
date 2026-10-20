@@ -1,0 +1,99 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Compressor from "../components/Compressor.astro";
+import FAQ from "../components/FAQ.astro";
+
+const faqItems = [
+  {
+    q: "Should I even include a photo on a US job application?",
+    a: "In the US, UK, Canada, and Australia, resume photos are generally discouraged and can work against you due to anti-discrimination norms in hiring. This tool is mainly useful when a specific portal explicitly asks for a headshot upload as a separate field — government job portals, some ATS systems, and creative-industry applications (acting, modeling, on-camera roles) being the most common cases — or when applying to a role or country where a photo is standard practice.",
+  },
+  {
+    q: "What size and format do hiring portals usually expect for a photo?",
+    a: "It varies by platform, but keeping a headshot under roughly 100–200 KB in JPG format is a safe target for most systems. Some applicant tracking systems (ATS) reject unusual formats like HEIC or TIFF outright, so JPG is the safest default unless the portal says otherwise.",
+  },
+  {
+    q: "Is this the same as compressing my resume file?",
+    a: "No — this tool compresses image files (JPG, PNG, WebP), not PDF or Word documents. If your resume itself is too large to upload, you'll need a PDF compressor instead; this tool is specifically for a separate photo/headshot upload field.",
+  },
+  {
+    q: "What's a good target size if the portal doesn't specify one?",
+    a: "100 KB is a reasonable default for a headshot-style photo — small enough to clear most upload limits, large enough to still look sharp at typical display sizes. If the portal gives an explicit number, use that instead.",
+  },
+];
+---
+
+<Layout
+  title="Resize a Photo for Job Application Uploads (Exact KB) | KB Compressor"
+  description="Compress a headshot or photo to the exact KB size a job application or hiring portal requires. Free, no upload — runs in your browser."
+>
+  <section class="mx-auto max-w-3xl px-4 pb-10 pt-14 text-center sm:pt-20">
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+      Compress a photo for job application portals
+    </h1>
+    <p class="mx-auto mt-4 max-w-xl text-slate-600 dark:text-slate-300">
+      Some hiring and government job portals ask for a headshot photo under a strict KB
+      limit, separate from your resume file. Set the limit from the portal and download a
+      photo sized to match.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 pb-16">
+    <Compressor
+      defaultTargetKB={100}
+      presets={[50, 100, 150, 200]}
+      contextNote="This tool compresses photos, not PDF resumes. If it's your resume file that's too large, you'll need a PDF compressor instead."
+      ratioWarningKB={null}
+    />
+  </section>
+
+  <section class="mx-auto max-w-3xl space-y-6 px-4 pb-20 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Getting a clean headshot under the limit</h2>
+      <p class="mt-2">
+        Portals that request a headshot photo alongside your application usually cap it well
+        below what a phone camera produces by default — a photo straight off a modern
+        smartphone can run several megabytes, while the upload field might cap out at
+        100&nbsp;KB or less. Compressing to a specific KB target, rather than dragging a vague
+        quality slider and hoping, means you can hit the limit on the first try instead of
+        guessing and re-uploading.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">When a photo actually belongs on a job application</h2>
+      <p class="mt-2">
+        Practice varies a lot by country and industry. In the US, UK, Canada, and Australia,
+        attaching a photo to a resume is generally discouraged — many employers and hiring
+        systems actively avoid looking at applicant photos to reduce bias risk, and some ATS
+        platforms strip images out entirely. Where this tool is genuinely useful is the
+        narrower case of a portal with a dedicated photo upload field — government job
+        applications, some corporate ATS systems, and creative fields like acting, modeling,
+        or on-camera roles, where a headshot is part of the actual application requirements
+        rather than an optional add-on to a resume.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">A resume photo is not a resume file</h2>
+      <p class="mt-2">
+        It's worth being clear about what this tool does and doesn't do: it compresses image
+        files only. If a job portal is rejecting your resume itself for being too large,
+        that's almost always a PDF or Word document size problem, not an image compression
+        problem, and needs a different tool. This page is specifically for the separate photo
+        or headshot upload field some portals include alongside the resume upload.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Formats that avoid upload problems</h2>
+      <p class="mt-2">
+        JPEG is the most universally accepted format across hiring portals and produces the
+        smallest file at acceptable quality, which is why it's the default output here.
+        Formats like HEIC (the default on many iPhones) or TIFF are rejected outright by a
+        lot of applicant tracking systems — if your photo is in one of those formats, convert
+        it to JPG or PNG first (most phones offer this as a share or export option), then use
+        this tool to hit your target size.
+      </p>
+    </div>
+  </section>
+
+  <FAQ items={faqItems} />
+</Layout>

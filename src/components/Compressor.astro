@@ -1,0 +1,269 @@
+---
+interface Props {
+  defaultTargetKB?: number;
+  presets?: number[];
+  contextNote?: string;
+  ratioWarningKB?: number | null;
+}
+
+const {
+  defaultTargetKB = 200,
+  presets = [50, 100, 150, 200, 240],
+  contextNote,
+  ratioWarningKB = 240,
+} = Astro.props;
+---
+
+<div
+  id="compressor"
+  class="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8"
+  data-ratio-warning-kb={ratioWarningKB ?? ""}
+>
+  <div
+    id="dropzone"
+    class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-white px-6 py-10 text-center transition-colors hover:border-indigo-400 dark:border-slate-700 dark:bg-slate-950"
+  >
+    <input id="file-input" type="file" accept="image/jpeg,image/png,image/webp" class="hidden" />
+    <svg xmlns="http://www.w3.org/2000/svg" class="mb-3 h-10 w-10 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M12 16V4M12 4l-4 4M12 4l4 4" />
+      <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+    </svg>
+    <p class="text-sm font-medium text-slate-700 dark:text-slate-200">Drop an image here, or click to choose a file</p>
+    <p class="mt-1 text-xs text-slate-400">JPG, PNG, or WebP &mdash; processed entirely on your device, never uploaded</p>
+  </div>
+
+  <div id="file-info" class="mt-4 hidden items-center justify-between gap-3 rounded-lg bg-white p-3 text-sm dark:bg-slate-950">
+    <span id="file-name" class="truncate text-slate-700 dark:text-slate-200"></span>
+    <button id="file-clear" type="button" class="shrink-0 text-slate-400 hover:text-red-500">Remove</button>
+  </div>
+
+  <div class="mt-6 grid gap-5 sm:grid-cols-2">
+    <div>
+      <label for="target-kb" class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200">
+        Target size (KB)
+      </label>
+      <input
+        id="target-kb"
+        type="number"
+        min="1"
+        step="1"
+        value={defaultTargetKB}
+        class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+      />
+      <div class="mt-2 flex flex-wrap gap-1.5">
+        {presets.map((kb) => (
+          <button type="button" class="preset-btn rounded-full border border-slate-300 px-2.5 py-1 text-xs text-slate-600 hover:border-indigo-400 hover:text-indigo-600 dark:border-slate-700 dark:text-slate-300 dark:hover:border-indigo-500 dark:hover:text-indigo-400" data-kb={kb}>
+            {kb} KB
+          </button>
+        ))}
+      </div>
+      {contextNote && <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">{contextNote}</p>}
+    </div>
+
+    <div>
+      <label for="output-format" class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200">
+        Output format
+      </label>
+      <select
+        id="output-format"
+        class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+      >
+        <option value="image/jpeg">JPG</option>
+        <option value="image/webp">WebP</option>
+        <option value="image/png">PNG</option>
+      </select>
+      <p id="png-note" class="mt-2 hidden text-xs text-amber-600 dark:text-amber-400">
+        PNG is lossless, so it can only shrink by resizing, not by quality. For a tight KB target, JPG or WebP will get you much closer.
+      </p>
+    </div>
+  </div>
+
+  <button
+    id="compress-btn"
+    type="button"
+    disabled
+    class="mt-6 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40"
+  >
+    Compress image
+  </button>
+
+  <p id="error-msg" class="mt-3 hidden text-sm text-red-600 dark:text-red-400"></p>
+
+  <div id="result" class="mt-6 hidden">
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="rounded-lg border border-slate-200 p-3 dark:border-slate-800">
+        <p class="text-xs font-medium uppercase tracking-wide text-slate-400">Original</p>
+        <img id="preview-original" class="mt-2 max-h-48 w-full rounded object-contain" alt="Original preview" />
+        <p id="stat-original" class="mt-2 text-sm text-slate-600 dark:text-slate-300"></p>
+      </div>
+      <div class="rounded-lg border border-indigo-200 p-3 dark:border-indigo-900">
+        <p class="text-xs font-medium uppercase tracking-wide text-indigo-500">Compressed</p>
+        <img id="preview-compressed" class="mt-2 max-h-48 w-full rounded object-contain" alt="Compressed preview" />
+        <p id="stat-compressed" class="mt-2 text-sm text-slate-600 dark:text-slate-300"></p>
+      </div>
+    </div>
+
+    <p id="already-under-msg" class="mt-3 hidden rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300"></p>
+    <p id="target-missed-msg" class="mt-3 hidden rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950/50 dark:text-amber-300"></p>
+    <p id="ratio-warning-msg" class="mt-3 hidden rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950/50 dark:text-amber-300"></p>
+
+    <a
+      id="download-link"
+      class="mt-4 inline-flex w-full items-center justify-center rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-700 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+      download
+    >
+      Download compressed image
+    </a>
+  </div>
+</div>
+
+<script>
+  import { compressToTargetKB, formatKB, OUTPUT_EXTENSION, type OutputMime } from "../lib/compress";
+
+  const root = document.getElementById("compressor")!;
+  const dropzone = document.getElementById("dropzone")!;
+  const fileInput = document.getElementById("file-input") as HTMLInputElement;
+  const fileInfo = document.getElementById("file-info")!;
+  const fileName = document.getElementById("file-name")!;
+  const fileClear = document.getElementById("file-clear")!;
+  const targetKbInput = document.getElementById("target-kb") as HTMLInputElement;
+  const outputFormat = document.getElementById("output-format") as HTMLSelectElement;
+  const pngNote = document.getElementById("png-note")!;
+  const compressBtn = document.getElementById("compress-btn") as HTMLButtonElement;
+  const errorMsg = document.getElementById("error-msg")!;
+  const result = document.getElementById("result")!;
+  const previewOriginal = document.getElementById("preview-original") as HTMLImageElement;
+  const previewCompressed = document.getElementById("preview-compressed") as HTMLImageElement;
+  const statOriginal = document.getElementById("stat-original")!;
+  const statCompressed = document.getElementById("stat-compressed")!;
+  const alreadyUnderMsg = document.getElementById("already-under-msg")!;
+  const targetMissedMsg = document.getElementById("target-missed-msg")!;
+  const ratioWarningMsg = document.getElementById("ratio-warning-msg")!;
+  const downloadLink = document.getElementById("download-link") as HTMLAnchorElement;
+
+  const ratioWarningKBAttr = root.dataset.ratioWarningKb;
+  const ratioWarningKB = ratioWarningKBAttr ? Number(ratioWarningKBAttr) : null;
+
+  let currentFile: File | null = null;
+
+  function resetError() {
+    errorMsg.classList.add("hidden");
+    errorMsg.textContent = "";
+  }
+
+  function showError(message: string) {
+    errorMsg.textContent = message;
+    errorMsg.classList.remove("hidden");
+  }
+
+  function setFile(file: File | null) {
+    currentFile = file;
+    result.classList.add("hidden");
+    resetError();
+
+    if (!file) {
+      fileInfo.classList.add("hidden");
+      fileInfo.classList.remove("flex");
+      compressBtn.disabled = true;
+      return;
+    }
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      showError("Please choose a JPG, PNG, or WebP image.");
+      setFile(null);
+      return;
+    }
+
+    fileName.textContent = `${file.name} (${formatKB(file.size)})`;
+    fileInfo.classList.remove("hidden");
+    fileInfo.classList.add("flex");
+    compressBtn.disabled = false;
+  }
+
+  dropzone.addEventListener("click", () => fileInput.click());
+  dropzone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropzone.classList.add("border-indigo-400");
+  });
+  dropzone.addEventListener("dragleave", () => dropzone.classList.remove("border-indigo-400"));
+  dropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropzone.classList.remove("border-indigo-400");
+    const file = e.dataTransfer?.files?.[0];
+    if (file) setFile(file);
+  });
+  fileInput.addEventListener("change", () => setFile(fileInput.files?.[0] ?? null));
+  fileClear.addEventListener("click", () => {
+    fileInput.value = "";
+    setFile(null);
+  });
+
+  document.querySelectorAll<HTMLButtonElement>(".preset-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      targetKbInput.value = btn.dataset.kb ?? "";
+    });
+  });
+
+  outputFormat.addEventListener("change", () => {
+    pngNote.classList.toggle("hidden", outputFormat.value !== "image/png");
+  });
+
+  compressBtn.addEventListener("click", async () => {
+    if (!currentFile) return;
+    resetError();
+
+    const targetKB = Number(targetKbInput.value);
+    if (!targetKB || targetKB <= 0) {
+      showError("Enter a target size greater than 0 KB.");
+      return;
+    }
+
+    compressBtn.disabled = true;
+    compressBtn.textContent = "Compressing…";
+
+    try {
+      const mime = outputFormat.value as OutputMime;
+      const compressed = await compressToTargetKB(currentFile, targetKB, mime);
+
+      previewOriginal.src = URL.createObjectURL(currentFile);
+      statOriginal.textContent = `${formatKB(compressed.originalSize)}`;
+
+      const compressedUrl = URL.createObjectURL(compressed.blob);
+      previewCompressed.src = compressedUrl;
+      const qualityText = compressed.quality !== null ? `, quality ${(compressed.quality * 100).toFixed(0)}%` : "";
+      statCompressed.textContent = `${formatKB(compressed.finalSize)} · ${compressed.width}×${compressed.height}px${qualityText}`;
+
+      if (compressed.alreadyUnderTarget) {
+        alreadyUnderMsg.textContent = `This photo is already ${formatKB(compressed.finalSize)}, under your ${targetKB} KB target — it's untouched, no re-compression needed.`;
+        alreadyUnderMsg.classList.remove("hidden");
+      } else {
+        alreadyUnderMsg.classList.add("hidden");
+      }
+
+      if (!compressed.hitTarget) {
+        targetMissedMsg.textContent = `Couldn't quite reach ${targetKB} KB without shrinking the image too far to be useful — this is the smallest we could get while keeping it recognizable. Try a source photo with less detail, or raise the target size.`;
+        targetMissedMsg.classList.remove("hidden");
+      } else {
+        targetMissedMsg.classList.add("hidden");
+      }
+
+      if (ratioWarningKB && compressed.ratio > 20) {
+        ratioWarningMsg.textContent = `This image was compressed ${compressed.ratio.toFixed(1)}:1 from the original. Forms like the DS-160 / DV Lottery cap compression at 20:1 — a ratio this high can get a photo flagged as over-compressed even though it's under the size limit. Consider starting from a higher-resolution source photo.`;
+        ratioWarningMsg.classList.remove("hidden");
+      } else {
+        ratioWarningMsg.classList.add("hidden");
+      }
+
+      const ext = OUTPUT_EXTENSION[mime];
+      downloadLink.href = compressedUrl;
+      downloadLink.download = currentFile.name.replace(/\.[^.]+$/, "") + `-${targetKB}kb.${ext}`;
+
+      result.classList.remove("hidden");
+    } catch (err) {
+      showError(err instanceof Error ? err.message : "Something went wrong compressing this image.");
+    } finally {
+      compressBtn.disabled = false;
+      compressBtn.textContent = "Compress image";
+    }
+  });
+</script>

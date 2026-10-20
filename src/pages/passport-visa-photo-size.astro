@@ -1,0 +1,101 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Compressor from "../components/Compressor.astro";
+import FAQ from "../components/FAQ.astro";
+
+const faqItems = [
+  {
+    q: "What's the DV Lottery / DS-160 photo size limit?",
+    a: "240 KB maximum, in JPEG format, with pixel dimensions of 600×600. There's also a minimum — the file shouldn't be compressed so far below 240 KB that it fails the compression-ratio check described below.",
+  },
+  {
+    q: "What is the 20:1 compression ratio rule, and why does it matter?",
+    a: "The State Department's photo validator compares your compressed file's size to an estimate of its uncompressed size, and rejects photos compressed more than roughly 20 times smaller than that — because compression that aggressive destroys the fine detail biometric matching systems rely on. A photo can be well under the 240 KB size limit and still fail this separate check, which is why this tool calculates and displays that ratio rather than just the file size.",
+  },
+  {
+    q: "What are the pixel dimensions required for a DV Lottery or visa photo?",
+    a: "600×600 pixels, a perfect square. This tool doesn't automatically crop to that dimension — resize and crop your photo to 600×600 first, then use this tool to bring it under the 240 KB limit without over-compressing.",
+  },
+  {
+    q: "Can I use this for a US passport renewal photo too?",
+    a: "Yes. Online passport renewal accepts a wider range — up to 10 MB and a broader pixel range (600×600 up to 1,200×1,200) — but if your renewal portal or photo still needs to be brought under a specific KB limit, the same target-size compression applies.",
+  },
+  {
+    q: "Will this guarantee my photo gets accepted?",
+    a: "No tool can guarantee that, since acceptance also depends on lighting, background, expression, and other content requirements the State Department checks that have nothing to do with file size. What this tool does guarantee is that you'll know your file size and compression ratio before you submit, instead of finding out from a rejection.",
+  },
+];
+---
+
+<Layout
+  title="Compress a Passport or Visa Photo to 240 KB (DS-160, DV Lottery) | KB Compressor"
+  description="Compress a US passport, visa, or DV Lottery photo to the exact KB limit. Warns you if compression exceeds the DS-160/DV Lottery 20:1 ratio cap."
+>
+  <section class="mx-auto max-w-3xl px-4 pb-10 pt-14 text-center sm:pt-20">
+    <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+      Compress a passport or visa photo to 240 KB
+    </h1>
+    <p class="mx-auto mt-4 max-w-xl text-slate-600 dark:text-slate-300">
+      DS-160, DV Lottery, and passport renewal photos must be 240 KB or smaller. This tool
+      also checks the compression ratio &mdash; a photo squeezed too hard can be flagged as
+      over-compressed even when it's under the size limit.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 pb-16">
+    <Compressor
+      defaultTargetKB={240}
+      presets={[150, 200, 240]}
+      contextNote="DV Lottery and DS-160 photos must be 600×600px JPEG, 240 KB max, with a compression ratio no higher than 20:1."
+      ratioWarningKB={240}
+    />
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 pb-20 space-y-6 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">The 20:1 compression ratio rule</h2>
+      <p class="mt-2">
+        Getting a photo under 240 KB is only half the requirement. The State Department's
+        photo validator also rejects images compressed more than 20:1 from their original
+        size, because heavy compression destroys the fine detail biometric checks look for.
+        A photo can pass the size check and still fail this one — and it's a genuinely common
+        mistake, because most compression tools only tell you the file size, not how hard
+        they had to squeeze to get there. This tool computes that ratio for you and warns if
+        you're over it, so you find out before you submit, not after.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">If you're over the ratio limit</h2>
+      <p class="mt-2">
+        Start from a higher-resolution, well-lit original photo rather than compressing an
+        already-small or already-compressed file harder. A sharper, larger source image
+        reaches 240 KB at a much gentler compression ratio, because there's more original
+        detail to begin with — the ratio is a comparison between your original and
+        compressed file sizes, so the fix is usually a better original, not a different
+        compression setting.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Dimensions matter as much as file size</h2>
+      <p class="mt-2">
+        DV Lottery and DS-160 photos need to be exactly 600×600 pixels — a square crop, not
+        just any small image. This tool focuses on hitting your KB target at whatever
+        dimensions you upload; crop your photo to a square first (most phone camera apps or a
+        basic photo editor can do this) before compressing, so the final file matches both
+        requirements at once.
+      </p>
+    </div>
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Why local processing matters here specifically</h2>
+      <p class="mt-2">
+        Passport and visa photos are about as sensitive as an image gets — tied directly to a
+        government identity document and a biometric process. This tool never uploads your
+        photo anywhere; the compression, the dimension check, and the ratio calculation all
+        happen locally in your browser using the Canvas API, so the only copy of your photo
+        that exists is the one already on your device.
+      </p>
+    </div>
+  </section>
+
+  <FAQ items={faqItems} />
+</Layout>
